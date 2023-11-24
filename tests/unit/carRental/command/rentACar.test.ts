@@ -1,19 +1,19 @@
 import 'reflect-metadata';
-import {v4} from 'uuid';
-import {container} from 'tsyringe';
-import {advanceTo} from 'jest-date-mock';
+import { v4 } from 'uuid';
+import { container } from 'tsyringe';
+import { advanceTo } from 'jest-date-mock';
 import DateParser from 'tests/utils/dateParser';
 import RentACar from 'src/core/useCases/carRental/command/rentACar/handler';
 import RentACarCommand from 'src/core/useCases/carRental/command/rentACar/types/command';
 import CarRentalDTO from 'src/core/domain/carRental/dto';
 import useInMemoryRepositories from 'src/configuration/injection/containers/repositories/inMemory';
-import {convertToNumericPrice} from 'tests/utils/misc';
+import { convertToNumericPrice } from 'tests/utils/misc';
 import useTestingUtilities from 'tests/configuration/containers/utils';
 import {
     populateAvailableCarFromTestCase,
-    populateCarsAndCarRentalsFromTestCase
+    populateCarsAndCarRentalsFromTestCase,
 } from 'tests/unit/utils/populateFromTestCase';
-import {CarTestCaseEntry} from 'tests/unit/utils/testCase.types';
+import { CarTestCaseEntry } from 'tests/unit/utils/testCase.types';
 import InMemoryCarRentalReadRepository from 'src/driven/repositories/inMemory/carRental/read';
 import TransactionInterface from 'src/core/domain/common/interfaces/transaction';
 import TransactionManagerInterface from 'src/core/domain/common/interfaces/transactionManager';
@@ -40,7 +40,7 @@ describe.each([
             dropOffDateTime: 'tomorrow',
         },
         expected: {
-            totalPrice: '100€'
+            totalPrice: '100€',
         },
     },
     {
@@ -63,9 +63,9 @@ describe.each([
                     {
                         pickupDateTime: 'tomorrow',
                         dropOffDateTime: 'in 5 days',
-                    }
+                    },
                 ],
-            }
+            },
         ] as Array<CarTestCaseEntry>,
         command: {
             customer: {
@@ -76,7 +76,7 @@ describe.each([
             dropOffDateTime: 'in 3 days',
         },
         expected: {
-            totalPrice: '1800€'
+            totalPrice: '1800€',
         },
     },
     {
@@ -108,68 +108,70 @@ describe.each([
             dropOffDateTime: 'in 3 days',
         },
         expected: {
-            totalPrice: '6000€'
+            totalPrice: '6000€',
         },
     },
-])('Scenario: A simple car rental ' +
-    'Given I am logged in as customer $command.customer.email ' +
-    'And the daily price for a $availableCar.model.name is $availableCar.model.dailyRate ' +
-    'When I rent a $availableCar.model.name starting $command.pickupDateTime and ending $command.dropOffDateTime ', function (testCase) {
-    let uc: RentACar;
-    let expectedCarRental: Partial<CarRentalDTO>;
-    let dateParser: DateParser;
-    let command: RentACarCommand;
-    let carRentalReadRepository: InMemoryCarRentalReadRepository;
+])(
+    'Scenario: A simple car rental ' +
+        'Given I am logged in as customer $command.customer.email ' +
+        'And the daily price for a $availableCar.model.name is $availableCar.model.dailyRate ' +
+        'When I rent a $availableCar.model.name starting $command.pickupDateTime and ending $command.dropOffDateTime ',
+    function (testCase) {
+        let uc: RentACar;
+        let expectedCarRental: Partial<CarRentalDTO>;
+        let dateParser: DateParser;
+        let command: RentACarCommand;
+        let carRentalReadRepository: InMemoryCarRentalReadRepository;
 
-    beforeAll(() => {
-        advanceTo(Date.now());
-        useTestingUtilities();
-        dateParser = container.resolve("DateParser");
-    });
-
-    beforeEach(async () => {
-        useInMemoryRepositories();
-        const transactionManager: TransactionManagerInterface = container.resolve("TransactionManagerInterface");
-        const transaction: TransactionInterface = transactionManager.newTransaction();
-        await populateCarsAndCarRentalsFromTestCase(testCase.cars);
-        await populateAvailableCarFromTestCase(testCase.availableCar as CarTestCaseEntry);
-        await transaction.commit();
-        carRentalReadRepository = container.resolve("CarRentalReadRepositoryInterface");
-        uc = new RentACar({
-            carReadRepository: container.resolve("CarReadRepositoryInterface"),
-            carRentalWriteRepository: container.resolve("CarRentalWriteRepositoryInterface"),
-            transactionManager: container.resolve("TransactionManagerInterface"),
+        beforeAll(() => {
+            advanceTo(Date.now());
+            useTestingUtilities();
+            dateParser = container.resolve('DateParser');
         });
-        command = {
-            customerId: testCase.command.customer.id,
-            carModelId: testCase.availableCar.model.id,
-            pickupDateTime: dateParser.parse(testCase.command.pickupDateTime),
-            dropOffDateTime: dateParser.parse(testCase.command.dropOffDateTime),
-        };
-        expectedCarRental = {
-            customerId: testCase.command.customer.id,
-            car: {
-                id: testCase.availableCar.id,
-                model: {
-                    id: testCase.availableCar.model.id,
-                    dailyRate: convertToNumericPrice(testCase.availableCar.model.dailyRate)
-                }
-            },
-            totalPrice: convertToNumericPrice(testCase.expected.totalPrice),
-            pickupDateTime: dateParser.parse(testCase.command.pickupDateTime),
-            dropOffDateTime: dateParser.parse(testCase.command.dropOffDateTime),
-        };
-    })
 
-    it(
-        `Then it should create a new car rental for a total of ${testCase.expected.totalPrice}`, async () => {
+        beforeEach(async () => {
+            useInMemoryRepositories();
+            const transactionManager: TransactionManagerInterface = container.resolve('TransactionManagerInterface');
+            const transaction: TransactionInterface = transactionManager.newTransaction();
+            await populateCarsAndCarRentalsFromTestCase(testCase.cars);
+            await populateAvailableCarFromTestCase(testCase.availableCar as CarTestCaseEntry);
+            await transaction.commit();
+            carRentalReadRepository = container.resolve('CarRentalReadRepositoryInterface');
+            uc = new RentACar({
+                carReadRepository: container.resolve('CarReadRepositoryInterface'),
+                carRentalWriteRepository: container.resolve('CarRentalWriteRepositoryInterface'),
+                transactionManager: container.resolve('TransactionManagerInterface'),
+            });
+            command = {
+                customerId: testCase.command.customer.id,
+                carModelId: testCase.availableCar.model.id,
+                pickupDateTime: dateParser.parse(testCase.command.pickupDateTime),
+                dropOffDateTime: dateParser.parse(testCase.command.dropOffDateTime),
+            };
+            expectedCarRental = {
+                customerId: testCase.command.customer.id,
+                car: {
+                    id: testCase.availableCar.id,
+                    model: {
+                        id: testCase.availableCar.model.id,
+                        dailyRate: convertToNumericPrice(testCase.availableCar.model.dailyRate),
+                    },
+                },
+                totalPrice: convertToNumericPrice(testCase.expected.totalPrice),
+                pickupDateTime: dateParser.parse(testCase.command.pickupDateTime),
+                dropOffDateTime: dateParser.parse(testCase.command.dropOffDateTime),
+            };
+        });
+
+        it(`Then it should create a new car rental for a total of ${testCase.expected.totalPrice}`, async () => {
             const carRental = await uc.execute(command);
             expectedCarRental.id = carRental.id;
             const retrievedCarRental = await carRentalReadRepository.read(carRental.id);
             expect(carRental).toEqual(expectedCarRental);
             expect(retrievedCarRental.toDTO()).toEqual(expectedCarRental);
-        })
-});
+        });
+    },
+);
 
 describe.each([
     {
@@ -184,7 +186,7 @@ describe.each([
                 {
                     pickupDateTime: 'today',
                     dropOffDateTime: 'in 5 days',
-                }
+                },
             ],
         },
         cars: [],
@@ -198,44 +200,44 @@ describe.each([
         },
         expected: {},
     },
-])('Scenario: No available cars ' +
-    'Given I am logged in as customer $command.customer.email ' +
-    'And there is 1 $unavailableCar.model.name in the system ' +
-    'And $unavailableCar.model.name is unavailable ' +
-    'When I rent a $$unavailableCar.model.name starting $command.pickupDateTime and ending $command.dropOffDateTime ', (testCase) => {
-    let uc: RentACar;
-    let dateParser: DateParser;
-    let command: RentACarCommand;
+])(
+    'Scenario: No available cars ' +
+        'Given I am logged in as customer $command.customer.email ' +
+        'And there is 1 $unavailableCar.model.name in the system ' +
+        'And $unavailableCar.model.name is unavailable ' +
+        'When I rent a $$unavailableCar.model.name starting $command.pickupDateTime and ending $command.dropOffDateTime ',
+    (testCase) => {
+        let uc: RentACar;
+        let dateParser: DateParser;
+        let command: RentACarCommand;
 
-    beforeAll(() => {
-        advanceTo(Date.now());
-        useTestingUtilities();
-        dateParser = container.resolve("DateParser");
-    });
-
-    beforeEach(async () => {
-        useInMemoryRepositories();
-        const transactionManager: TransactionManagerInterface = container.resolve("TransactionManagerInterface");
-        const transaction: TransactionInterface = transactionManager.newTransaction();
-        await populateAvailableCarFromTestCase(testCase.availableCar as CarTestCaseEntry);
-        await transaction.commit();
-        uc = new RentACar({
-            carReadRepository: container.resolve("CarReadRepositoryInterface"),
-            carRentalWriteRepository: container.resolve("CarRentalWriteRepositoryInterface"),
-            transactionManager: container.resolve("TransactionManagerInterface"),
+        beforeAll(() => {
+            advanceTo(Date.now());
+            useTestingUtilities();
+            dateParser = container.resolve('DateParser');
         });
-        command = {
-            customerId: testCase.command.customer.id,
-            carModelId: testCase.availableCar.model.id,
-            pickupDateTime: dateParser.parse(testCase.command.pickupDateTime),
-            dropOffDateTime: dateParser.parse(testCase.command.dropOffDateTime),
-        };
-    })
 
-    it(
-        `Then it should raise an error 'UnavailableCarError'`, async () => {
-            await expect(uc.execute(command)).rejects.toThrow(
-                UnavailableCarError
-            );
-        })
-})
+        beforeEach(async () => {
+            useInMemoryRepositories();
+            const transactionManager: TransactionManagerInterface = container.resolve('TransactionManagerInterface');
+            const transaction: TransactionInterface = transactionManager.newTransaction();
+            await populateAvailableCarFromTestCase(testCase.availableCar as CarTestCaseEntry);
+            await transaction.commit();
+            uc = new RentACar({
+                carReadRepository: container.resolve('CarReadRepositoryInterface'),
+                carRentalWriteRepository: container.resolve('CarRentalWriteRepositoryInterface'),
+                transactionManager: container.resolve('TransactionManagerInterface'),
+            });
+            command = {
+                customerId: testCase.command.customer.id,
+                carModelId: testCase.availableCar.model.id,
+                pickupDateTime: dateParser.parse(testCase.command.pickupDateTime),
+                dropOffDateTime: dateParser.parse(testCase.command.dropOffDateTime),
+            };
+        });
+
+        it(`Then it should raise an error 'UnavailableCarError'`, async () => {
+            await expect(uc.execute(command)).rejects.toThrow(UnavailableCarError);
+        });
+    },
+);

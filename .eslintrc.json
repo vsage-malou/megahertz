@@ -2,7 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": ["tsconfig.json"]
+    "project": ["./tsconfig.json"]
   },
   "env": {
     "node": true
@@ -11,7 +11,7 @@
     {
       "files": ["*.js", "*.jsx", "*.ts", "*.tsx"],
       "extends": ["@thetribe/eslint-config-typescript", "prettier"],
-      "plugins": ["@typescript-eslint"],
+      "plugins": ["@typescript-eslint", "jest"],
       "rules": {
         "import/no-unresolved": 0,
         "import/prefer-default-export": 0,

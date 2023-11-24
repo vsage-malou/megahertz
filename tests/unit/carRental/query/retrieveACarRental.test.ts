@@ -10,7 +10,7 @@ import TransactionInterface from 'src/core/domain/common/interfaces/transaction'
 import CarRentalDTO from 'src/core/domain/carRental/dto';
 import {convertToNumericPrice} from 'tests/utils/misc';
 import RetrieveACarRentalQuery from 'src/core/useCases/carRental/query/retrieveACarRental/types/query';
-import {populateCarModel, populateCarRental} from '../../utils/populate';
+import {populateCar, populateCarModel, populateCarRental} from '../../utils/populate';
 import UnitOfWork from 'src/driven/repositories/inMemory/common/unitOfWork';
 import InMemoryCarRentalReadRepository from 'src/driven/repositories/inMemory/carRental/read';
 
@@ -88,6 +88,11 @@ describe.each([
             customerId: testCase.carRental.customerId,
             totalPrice
         }, unitOfWork);
+        await populateCar({
+            id: testCase.carRental.car.id,
+            modelId: testCase.carRental.car.model.id,
+            licensePlate: 'license_plate'
+        }, unitOfWork)
         await populateCarModel({
             id: testCase.carRental.car.model.id,
             dailyRate: 0,
@@ -97,7 +102,9 @@ describe.each([
         uc = new RetrieveACarRental({
             carRentalReadRepository,
         });
-        query = {}
+        query = {
+            id: testCase.carRental.id
+        }
         expectedCarRental = {
             id: testCase.carRental.id,
             customerId: testCase.carRental.customerId,
@@ -115,7 +122,7 @@ describe.each([
     })
 
     it(`Then it should return one car rental with ID ${testCase.carRental.id}`, async () => {
-        const carRental = await uc.execute();
+        const carRental = await uc.execute(query);
         expect(carRental).toEqual(expectedCarRental);
     })
 })

@@ -8,11 +8,13 @@ import CarRentalReadRepositoryInterface from 'src/core/domain/carRental/interfac
 export default class RetrieveACarRental {
     private readonly carRentalReadRepository: CarRentalReadRepositoryInterface;
 
-    constructor({carRentalReadRepository}: { carRentalReadRepository: CarRentalReadRepositoryInterface }) {
+    constructor({ carRentalReadRepository }: { carRentalReadRepository: CarRentalReadRepositoryInterface }) {
         this.carRentalReadRepository = carRentalReadRepository;
     }
 
-    async execute(): Promise<CarRentalDTO> {
-
+    async execute(query: RetrieveACarRentalQuery): Promise<CarRentalDTO> {
+        const { id } = query;
+        const carRental = await this.carRentalReadRepository.read(id)
+        return carRental.toDTO()
     }
 }

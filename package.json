@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:unit": "jest unit",
     "lint": "eslint src --ext ts,tsx",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
   },
