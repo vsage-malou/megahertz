@@ -18,6 +18,7 @@ import InMemoryCarRentalReadRepository from 'src/driven/repositories/inMemory/ca
 import TransactionInterface from 'src/core/domain/common/interfaces/transaction';
 import TransactionManagerInterface from 'src/core/domain/common/interfaces/transactionManager';
 import UnavailableCarError from 'src/core/domain/car/errors/unavailable';
+import InMemoryTransactionManager from "src/driven/repositories/inMemory/common/transactions/manager";
 
 describe.each([
     {
